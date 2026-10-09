@@ -1,0 +1,17 @@
+<section class="auth-card reveal">
+  <h1>Welcome Back</h1>
+  <form action="/auth/login" method="POST">
+    <div class="float-field">
+      <input type="email" name="email" id="email" placeholder=" " required autocomplete="email" />
+      <label for="email">Email</label>
+    </div>
+
+    <div class="float-field">
+      <input type="password" name="password" id="password" placeholder=" " required autocomplete="current-password" />
+      <label for="password">Password</label>
+    </div>
+
+    <button class="btn btn-primary btn-block" type="submit">Log In</button>
+  </form>
+  <p class="muted">Don't have an account? <a href="/auth/register">Sign up</a></p>
+</section>

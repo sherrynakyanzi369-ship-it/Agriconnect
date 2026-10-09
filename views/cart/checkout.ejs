@@ -1,0 +1,72 @@
+<section class="section-head">
+  <h1>Checkout</h1>
+  <a class="btn btn-outline btn-sm" href="/cart">Back to Cart</a>
+</section>
+
+<div class="cart-layout">
+  <div class="cart-items">
+    <h3>Your Items</h3>
+    <div class="table-wrap">
+      <table class="cart-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% lines.forEach((line) => { %>
+            <tr>
+              <td>
+                <span class="cart-thumb"><img src="<%= h.imageUrl(line.image) %>" alt="" /></span>
+                <span class="cart-name"><%= line.name %></span>
+              </td>
+              <td><%= h.currency(line.price) %> / <%= line.unit %></td>
+              <td><%= line.quantity %></td>
+              <td><%= h.currency(line.totalPrice) %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <aside class="cart-summary">
+    <h3>Order Total</h3>
+    <div class="line"><span>Items</span><span><%= lines.reduce((n, l) => n + l.quantity, 0) %></span></div>
+    <div class="line"><span>Subtotal</span><span><%= h.currency(cart.totalPrice) %></span></div>
+    <hr />
+    <div class="line"><span>Total</span></div>
+    <p class="cart-total"><%= h.currency(cart.totalPrice) %></p>
+  </aside>
+</div>
+
+<form class="panel order-form" action="/cart/checkout" method="POST">
+  <h3>Shipping Address</h3>
+  <div class="float-field">
+    <input type="text" name="shippingAddress[street]" id="street" placeholder=" " required />
+    <label for="street">Street Address</label>
+  </div>
+  <div class="float-field">
+    <input type="text" name="shippingAddress[city]" id="city" placeholder=" " required />
+    <label for="city">City</label>
+  </div>
+  <div class="form-row">
+    <div class="float-field">
+      <input type="text" name="shippingAddress[state]" id="state" placeholder=" " required />
+      <label for="state">State</label>
+    </div>
+    <div class="float-field">
+      <input type="text" name="shippingAddress[zip]" id="zip" placeholder=" " />
+      <label for="zip">ZIP Code</label>
+    </div>
+  </div>
+  <div class="float-field">
+    <textarea name="notes" id="notes" rows="3" placeholder=" "></textarea>
+    <label for="notes">Order Notes (optional)</label>
+  </div>
+
+  <button class="btn btn-primary btn-block" type="submit" style="margin-top: 1.2rem">Place Order</button>
+</form>

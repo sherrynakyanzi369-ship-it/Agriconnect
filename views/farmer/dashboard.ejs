@@ -1,0 +1,161 @@
+<%
+  const safeTotalProducts = typeof totalProducts !== 'undefined' ? totalProducts : (typeof products !== 'undefined' ? products.length : 0);
+  const safeTotalStock = typeof totalStock !== 'undefined' ? totalStock : 0;
+  const safeTotalOrders = typeof totalOrders !== 'undefined' ? totalOrders : (typeof orders !== 'undefined' ? orders.length : 0);
+  const safeNeedRestock = typeof needRestock !== 'undefined' ? needRestock : (typeof products !== 'undefined' ? products.filter((p) => p.quantityAvailable <= 5).length : 0);
+%>
+<% const hasProducts = typeof products !== 'undefined' && products.length; %>
+<% const hasOrders = typeof orders !== 'undefined' && orders.length; %>
+
+<section class="section-head">
+  <h1>AgriConnect Farmer Dashboard</h1>
+  <a class="btn btn-primary" href="/products/new">+ Add Product</a>
+</section>
+
+<section class="farm-summary reveal">
+  <img src="<%= h.imageUrl(farm.profileImage, 'uploads/default-farm.png') %>" alt="<%= farm.farmName %>" />
+  <div>
+    <h2><%= farm.farmName %></h2>
+    <p class="muted">
+      <%= farm.location.city %>, <%= farm.location.state %>
+      <% if (farm.isVerified) { %><span class="badge">Verified</span><% } else { %><span class="badge badge-warn">Unverified</span><% } %>
+    </p>
+    <div class="summary-actions">
+      <a href="/farm/edit" class="btn btn-outline btn-sm">Edit Farm Profile</a>
+      <a href="/farm/<%= farm._id %>" class="btn btn-outline btn-sm">View Public Page</a>
+    </div>
+  </div>
+</section>
+
+<section class="stat-grid reveal">
+  <div class="stat-card">
+    <span class="stat-value"><%= safeTotalProducts %></span>
+    <span class="stat-label">Products Listed</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-value"><%= safeTotalStock %></span>
+    <span class="stat-label">Units in Stock</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-value"><%= safeTotalOrders %></span>
+    <span class="stat-label">Customer Orders</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-value"><%= safeNeedRestock %></span>
+    <span class="stat-label">Need Restock</span>
+    <span class="stat-sub muted">items at 5 or fewer units</span>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>Inventory</h2>
+    <div class="panel-meta">
+      <span><strong><%= safeTotalProducts %></strong> listed</span>
+      <span><strong><%= safeTotalStock %></strong> units in stock</span>
+    </div>
+    <a class="btn btn-primary btn-sm" href="/products/new">+ Add Product</a>
+  </div>
+
+  <% if (hasProducts) { %>
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% products.forEach((p) => { %>
+            <% const outOfStock = p.status === 'OUT_OF_STOCK' || p.quantityAvailable < 1; %>
+            <tr>
+              <td>
+                <a href="/products/<%= p._id %>"><%= p.name %></a>
+                <% if (p.harvestDate) { %>
+                  <span class="muted block">Harvested <%= p.harvestDate.toLocaleDateString() %></span>
+                <% } %>
+              </td>
+              <td><%= p.category ? p.category.name : '—' %></td>
+              <td><%= h.currency(p.price) %> / <%= p.unit %></td>
+              <td>
+                <span class="stock <%= p.quantityAvailable < 1 ? 'stock-low' : (p.quantityAvailable <= 5 ? 'stock-thin' : '') %>"><%= p.quantityAvailable %></span>
+                <span class="muted">in stock</span>
+              </td>
+              <td>
+                <% if (outOfStock) { %><span class="status status-out">Out of Stock</span>
+                <% } else if (p.quantityAvailable <= 5) { %><span class="status status-low">Low Stock</span>
+                <% } else { %><span class="status status-in">In Stock</span><% } %>
+              </td>
+              <td class="table-actions">
+                <a class="btn btn-sm" href="/products/<%= p._id %>/edit">Edit</a>
+                <form action="/products/<%= p._id %>?_method=DELETE" method="POST" onsubmit="return confirm('Delete this product?');">
+                  <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } else { %>
+    <div class="empty">
+      <span class="empty-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg>
+      </span>
+      <p>Your inventory is empty.</p>
+      <p class="muted"><a href="/products/new">Add your first product</a> to start selling.</p>
+    </div>
+  <% } %>
+</section>
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>Customer Orders</h2>
+    <span class="muted">Orders placed for your produce</span>
+  </div>
+
+  <% if (hasOrders) { %>
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Order</th>
+            <th>Date</th>
+            <th>Customer</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% orders.forEach((o) => { %>
+            <tr>
+              <td><a href="/orders/<%= o._id %>">#<%= o._id.toString().slice(-8) %></a></td>
+              <td><%= new Date(o.createdAt).toLocaleDateString() %></td>
+              <td>
+                <%= o.customer ? o.customer.name : 'Customer' %>
+                <% if (o.customer) { %><span class="muted block"><%= o.customer.email %></span><% } %>
+              </td>
+              <td class="order-items"><%= o.items.map((i) => i.quantity + 'x ' + i.name).join(', ') %></td>
+              <td><%= h.currency(o.totalPrice) %></td>
+              <td><span class="badge badge-<%= o.status.toLowerCase() %>"><%= o.status %></span></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } else { %>
+    <div class="empty">
+      <span class="empty-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </span>
+      <p>No orders for your produce yet.</p>
+      <p class="muted">Share your farm page to get orders flowing!</p>
+    </div>
+  <% } %>
+</section>

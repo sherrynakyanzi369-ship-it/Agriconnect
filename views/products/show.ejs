@@ -1,0 +1,78 @@
+<section class="product-detail">
+  <div class="product-gallery reveal">
+    <button type="button" class="gallery-main" id="gallery-main" aria-label="View photo full screen">
+      <img src="<%= h.imageUrl(product.image) %>" alt="<%= product.name %>" class="main" />
+      <span class="gallery-zoom" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6"/><path d="M8 11h6"/></svg>
+        View full screen
+      </span>
+    </button>
+  </div>
+
+  <div class="product-info">
+    <h1><%= product.name %></h1>
+    <div class="badge-row">
+      <% if (product.status === 'OUT_OF_STOCK' || product.quantityAvailable < 1) { %>
+        <span class="badge badge-out">Out of stock</span>
+      <% } else if (product.quantityAvailable <= 5) { %>
+        <span class="badge badge-low">Only <%= product.quantityAvailable %> left</span>
+      <% } %>
+    </div>
+    <p class="price price-lg"><%= h.currency(product.price) %> <span class="muted">/ <%= product.unit %></span></p>
+
+    <p><%= product.description || 'No description provided.' %></p>
+
+    <div class="product-meta">
+      <% if (product.harvestDate) { %>
+        <p class="muted"><strong>Harvested:</strong> <%= product.harvestDate.toLocaleDateString() %></p>
+      <% } %>
+
+      <% if (product.category) { %>
+        <p class="muted"><strong>Category:</strong> <%= product.category.name %></p>
+      <% } %>
+
+      <% if (product.profile) { %>
+        <p class="muted">
+          Sold by
+          <a href="/farm/<%= product.profile._id %>"><%= product.profile.farmName %></a>
+          <% if (product.profile.location && product.profile.location.city) { %>
+            &middot; <%= product.profile.location.city %>, <%= product.profile.location.state %>
+          <% } %>
+        </p>
+      <% } else if (product.farmer) { %>
+        <p class="muted">Sold by <%= product.farmer.name %></p>
+      <% } %>
+    </div>
+
+    <% const outOfStock = product.status === 'OUT_OF_STOCK' || product.quantityAvailable < 1; %>
+    <% if (user) { %>
+      <div class="product-buy">
+        <form action="/cart/add" method="POST">
+          <input type="hidden" name="product" value="<%= product._id %>" />
+          <p class="stock-line">
+            <span class="stock <%= outOfStock ? 'stock-low' : (product.quantityAvailable <= 5 ? 'stock-thin' : '') %>"><%= product.quantityAvailable %></span>
+            <span class="muted">available</span>
+          </p>
+          <label for="qty">Quantity (<%= product.unit %>)</label>
+          <input type="number" name="quantity" id="qty" min="1" max="<%= product.quantityAvailable %>" value="1" required <%= outOfStock ? 'disabled' : '' %> />
+          <button class="btn btn-primary btn-block" type="submit" style="margin-top: 1rem" <%= outOfStock ? 'disabled' : '' %>>
+            <%= outOfStock ? 'Out of Stock' : 'Add to Cart' %>
+          </button>
+          <a class="btn btn-outline btn-block" href="/cart" style="margin-top: 0.6rem">View Cart</a>
+        </form>
+      </div>
+    <% } else { %>
+      <div class="product-buy">
+        <p class="muted">Please <a href="/auth/login">log in</a> to add items to your cart.</p>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<div class="lightbox" id="lightbox" hidden>
+  <button type="button" class="lightbox-close" id="lightbox-close" aria-label="Close">&times;</button>
+  <figure class="lightbox-figure">
+    <img src="<%= h.imageUrl(product.image) %>" alt="<%= product.name %>" id="lightbox-img" />
+    <figcaption><%= product.name %> &middot; <%= h.currency(product.price) %> / <%= product.unit %></figcaption>
+  </figure>
+</div>

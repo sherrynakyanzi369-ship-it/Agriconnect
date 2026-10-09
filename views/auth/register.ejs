@@ -1,0 +1,57 @@
+<section class="auth-card reveal">
+  <h1>Create Your Account</h1>
+  <form action="/auth/register" method="POST">
+    <div class="float-field">
+      <input type="text" name="name" id="name" placeholder=" " required autocomplete="name" />
+      <label for="name">Full Name</label>
+    </div>
+
+    <div class="float-field">
+      <input type="email" name="email" id="email" placeholder=" " required autocomplete="email" />
+      <label for="email">Email</label>
+    </div>
+
+    <div class="float-field">
+      <input type="tel" name="phone" id="phone" placeholder=" " />
+      <label for="phone">Phone (optional)</label>
+    </div>
+
+    <div class="float-field">
+      <input type="text" name="street" id="street" placeholder=" " />
+      <label for="street">Street Address (optional)</label>
+    </div>
+
+    <div class="form-row">
+      <div class="float-field">
+        <input type="text" name="city" id="city" placeholder=" " />
+        <label for="city">City (optional)</label>
+      </div>
+      <div class="float-field">
+        <input type="text" name="state" id="state" placeholder=" " />
+        <label for="state">State (optional)</label>
+      </div>
+      <div class="float-field">
+        <input type="text" name="zip" id="zip" placeholder=" " />
+        <label for="zip">Zip (optional)</label>
+      </div>
+    </div>
+
+    <div class="float-field">
+      <input type="password" name="password" id="password" placeholder=" " minlength="6" required autocomplete="new-password" />
+      <label for="password">Password (min 6 characters)</label>
+    </div>
+
+    <div class="float-field">
+      <input type="password" name="confirmPassword" id="confirmPassword" placeholder=" " required autocomplete="new-password" />
+      <label for="confirmPassword">Confirm Password</label>
+    </div>
+
+    <label class="checkbox">
+      <input type="checkbox" name="role" value="FARMER" />
+      I'm a farmer / producer — register me to sell produce
+    </label>
+
+    <button class="btn btn-primary btn-block" type="submit">Create Account</button>
+  </form>
+  <p class="muted">Already have an account? <a href="/auth/login">Log in</a></p>
+</section>

@@ -1,0 +1,61 @@
+<section class="auth-card">
+  <h1><%= farm ? 'Edit Your Farm' : 'Create Your Farm' %></h1>
+  <form action="/farm<%= farm ? '/edit?_method=PUT' : '/create' %>" method="POST" enctype="multipart/form-data">
+    <div class="float-field">
+      <input type="text" name="farmName" id="farmName" value="<%= farm ? farm.farmName : '' %>" placeholder=" " required />
+      <label for="farmName">Farm Name</label>
+    </div>
+
+    <div class="float-field">
+      <textarea name="biography" id="biography" rows="4" placeholder=" "><%= farm ? farm.biography : '' %></textarea>
+      <label for="biography">Biography</label>
+    </div>
+
+    <div class="float-field">
+      <input type="text" name="address" id="address" value="<%= farm && farm.location ? farm.location.address : '' %>" placeholder=" " required />
+      <label for="address">Street Address</label>
+    </div>
+
+    <div class="form-row">
+      <div class="float-field">
+        <input type="text" name="city" id="city" value="<%= farm && farm.location ? farm.location.city : '' %>" placeholder=" " required />
+        <label for="city">City</label>
+      </div>
+      <div class="float-field">
+        <input type="text" name="state" id="state" value="<%= farm && farm.location ? farm.location.state : '' %>" placeholder=" " required />
+        <label for="state">State</label>
+      </div>
+      <div class="float-field">
+        <input type="text" name="zip" id="zip" value="<%= farm && farm.location ? farm.location.zip : '' %>" placeholder=" " />
+        <label for="zip">Zip</label>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="float-field">
+        <input type="tel" name="phone" id="phone" value="<%= farm && farm.contactInfo ? farm.contactInfo.phone : '' %>" placeholder=" " />
+        <label for="phone">Contact Phone (optional)</label>
+      </div>
+      <div class="float-field">
+        <input type="email" name="email" id="email" value="<%= farm && farm.contactInfo ? farm.contactInfo.email : '' %>" placeholder=" " />
+        <label for="email">Contact Email (optional)</label>
+      </div>
+    </div>
+
+    <div class="float-field">
+      <input type="text" name="certifications" id="certifications"
+        value="<%= farm && farm.certifications ? farm.certifications.join(', ') : '' %>" placeholder=" " />
+      <label for="certifications">Certifications (comma separated) - optional</label>
+    </div>
+
+    <label for="profileImage">Farm Photo</label>
+    <div class="file-field">
+      <input type="file" name="profileImage" id="profileImage" accept="image/*" data-preview="<%= farm && farm.profileImage ? h.imageUrl(farm.profileImage) : '' %>" />
+      <img class="file-preview <%= farm && farm.profileImage ? 'has-img' : '' %>" id="profile-preview" src="<%= farm && farm.profileImage ? h.imageUrl(farm.profileImage) : '' %>" alt="Preview" />
+    </div>
+
+    <button class="btn btn-primary btn-block" type="submit">
+      <%= farm ? 'Save Changes' : 'Create Farm' %>
+    </button>
+  </form>
+</section>

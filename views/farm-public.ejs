@@ -1,0 +1,58 @@
+<section class="farm-public">
+  <div class="farm-header reveal">
+    <img src="<%= h.imageUrl(farm.profileImage, 'uploads/default-farm.png') %>" alt="<%= farm.farmName %>" />
+    <div>
+      <h1><%= farm.farmName %></h1>
+      <p class="muted">
+        <%= farm.location.address %>, <%= farm.location.city %>, <%= farm.location.state %>
+        <% if (farm.isVerified) { %><span class="badge">Verified</span><% } %>
+      </p>
+      <% if (farm.certifications && farm.certifications.length) { %>
+        <p class="muted"><strong>Certifications:</strong> <%= farm.certifications.join(', ') %></p>
+      <% } %>
+      <% if (farm.biography) { %>
+        <p><%= farm.biography %></p>
+      <% } %>
+      <% if (farm.contactInfo && (farm.contactInfo.phone || farm.contactInfo.email)) { %>
+        <p class="muted">
+          Contact:
+          <% if (farm.contactInfo.phone) { %><a href="tel:<%= farm.contactInfo.phone %>"><%= farm.contactInfo.phone %></a><% } %>
+          <% if (farm.contactInfo.phone && farm.contactInfo.email) { %> &middot; <% } %>
+          <% if (farm.contactInfo.email) { %><a href="mailto:<%= farm.contactInfo.email %>"><%= farm.contactInfo.email %></a><% } %>
+        </p>
+      <% } %>
+      <p class="muted">Owned by <%= farm.user ? farm.user.name : 'a local farmer' %></p>
+    </div>
+  </div>
+
+  <h2>Available Products</h2>
+  <% if (products.length) { %>
+    <div class="grid">
+      <% products.forEach((p) => { %>
+        <% const outSk = p.status === 'OUT_OF_STOCK' || p.quantityAvailable < 1; %>
+        <div class="card <%= outSk ? 'is-out' : '' %>">
+          <span class="thumb">
+            <img src="<%= h.imageUrl(p.image) %>" alt="<%= p.name %>" loading="lazy" />
+            <span class="card-ribbons">
+              <% if (outSk) { %><span class="badge badge-out">Out of stock</span><% } %>
+            </span>
+            <% if (user && !outSk) { %>
+              <button type="button" class="quick-add" data-product="<%= p._id %>" aria-label="Add <%= p.name %> to cart">+ Add</button>
+            <% } %>
+          </span>
+          <div class="card-body">
+            <% if (p.category) { %><span class="card-cat"><%= p.category.name %></span><% } %>
+            <h3><%= p.name %></h3>
+            <div class="card-meta">
+              <span class="price"><%= h.currency(p.price) %><small> / <%= p.unit %></small></span>
+              <span class="card-stock <%= p.status === 'OUT_OF_STOCK' || p.quantityAvailable < 1 ? 'is-out' : '' %>"><%= p.quantityAvailable %> available</span>
+            </div>
+            <a class="stretched-link" href="/products/<%= p._id %>" aria-label="<%= p.name %>"></a>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <p class="empty">This farm has no available products right now.</p>
+  <% } %>
+</section>

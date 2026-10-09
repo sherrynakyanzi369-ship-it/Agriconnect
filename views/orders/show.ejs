@@ -1,0 +1,61 @@
+<section class="order-detail">
+  <div class="section-head">
+    <h1>Order #<%= order._id.toString().slice(-8) %></h1>
+    <span class="badge badge-<%= order.status.toLowerCase() %>"><%= order.status %></span>
+  </div>
+
+  <p class="muted">
+    Placed <%= new Date(order.createdAt).toLocaleString() %>
+    <% if (user && user.role === 'ADMIN' && order.customer) { %>
+      &middot; Customer: <%= order.customer.name %> (<%= order.customer.email %>)
+    <% } %>
+  </p>
+
+  <h3>Items</h3>
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr><th>Item</th><th>Price</th><th>Qty</th><th>Total</th></tr>
+      </thead>
+      <tbody>
+        <% order.items.forEach((item) => { %>
+          <tr>
+            <td><%= item.name %></td>
+            <td><%= h.currency(item.price) %> / <%= item.unit %></td>
+            <td><%= item.quantity %></td>
+            <td><%= h.currency(item.price * item.quantity) %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="order-summary">
+    <div class="row"><span>Subtotal</span><span><%= h.currency(order.totalPrice) %></span></div>
+    <div class="row"><span>Delivery</span><span>Included</span></div>
+    <div class="row total-row"><strong>Total</strong><span class="price price-lg"><%= h.currency(order.totalPrice) %></span></div>
+  </div>
+
+  <h3>Shipping Address</h3>
+  <div class="ship-address">
+    <p>
+      <%= order.shippingAddress.street %><br />
+      <%= order.shippingAddress.city %>, <%= order.shippingAddress.state %> <%= order.shippingAddress.zip || '' %>
+    </p>
+    <% if (order.notes) { %>
+      <p class="muted"><strong>Notes:</strong> <%= order.notes %></p>
+    <% } %>
+  </div>
+
+  <% if (canManage) { %>
+    <form class="inline-form" action="/orders/<%= order._id %>?_method=PUT" method="POST">
+      <label for="status">Update Status</label>
+      <select name="status" id="status">
+        <% ['PENDING', 'CONFIRMED', 'DELIVERED'].forEach((s) => { %>
+          <option value="<%= s %>" <%= order.status === s ? 'selected' : '' %>><%= s %></option>
+        <% }) %>
+      </select>
+      <button class="btn btn-primary" type="submit">Update</button>
+    </form>
+  <% } %>
+</section>

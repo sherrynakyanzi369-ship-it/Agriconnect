@@ -1,0 +1,108 @@
+<section class="hero">
+  <div class="hero-scene" aria-hidden="true"></div>
+  <div class="container">
+    <p class="hero-eyebrow reveal">Farm to table, always</p>
+    <h1 class="reveal">AgriConnect: Fresh Produce, Straight From Local Farms</h1>
+    <p class="reveal">
+      Buy directly from farmers, manage your farm, and bring the harvest straight to your table.
+    </p>
+    <div class="hero-actions reveal">
+      <a class="btn btn-primary btn-lg" href="/products">Browse Produce</a>
+      <% if (!user) { %>
+        <a class="btn btn-light btn-lg" href="/auth/register">Become a Seller</a>
+      <% } else if (user.role !== 'FARMER') { %>
+        <a class="btn btn-light btn-lg" href="/farm/create">Become a Seller</a>
+      <% } %>
+    </div>
+    <div class="hero-stats">
+      <span><strong data-count="<%= productsCount %>"><%= productsCount %></strong> products listed</span>
+      <span><strong data-count="<%= farmsCount %>"><%= farmsCount %></strong> verified farms</span>
+    </div>
+  </div>
+</section>
+
+<% if (categories && categories.length) { %>
+  <section class="container reveal">
+    <div class="section-head">
+      <h2>Shop by Category</h2>
+      <a href="/products">View all &rarr;</a>
+    </div>
+    <div class="cat-grid">
+      <% categories.forEach((c) => { %>
+        <a class="cat-card" href="/products?category=<%= c.slug %>" aria-label="Browse <%= c.name %>">
+          <span class="cat-thumb">
+            <img src="<%= h.imageUrl(c.image) %>" alt="<%= c.name %>" loading="lazy" />
+          </span>
+          <span class="cat-overlay">
+            <span class="cat-name"><%= c.name %></span>
+            <span class="cat-go" aria-hidden="true">Shop now &rarr;</span>
+          </span>
+        </a>
+      <% }) %>
+    </div>
+  </section>
+<% } %>
+
+<section class="container reveal">
+  <div class="steps">
+    <div class="step">
+      <span class="step-num">1</span>
+      <h3>Browse &amp; Filter</h3>
+      <p class="muted">Search produce by category, farm, or location.</p>
+    </div>
+    <div class="step">
+      <span class="step-num">2</span>
+      <h3>Fill Your Cart</h3>
+      <p class="muted">Adjust quantities and checkout in seconds.</p>
+    </div>
+    <div class="step">
+      <span class="step-num">3</span>
+      <h3>Farm to Table</h3>
+      <p class="muted">Farmers deliver the harvest to your door.</p>
+    </div>
+  </div>
+</section>
+
+<section class="container">
+  <div class="section-head reveal">
+    <h2>Featured Produce</h2>
+    <a href="/products">View all &rarr;</a>
+  </div>
+
+  <% if (featuredProducts.length) { %>
+    <div class="grid">
+      <% featuredProducts.forEach((p) => { %>
+        <% const outOfStock = p.status === 'OUT_OF_STOCK' || p.quantityAvailable < 1; %>
+        <% const lowStock = !outOfStock && p.quantityAvailable <= 5; %>
+        <div class="card reveal <%= outOfStock ? 'is-out' : '' %>">
+          <span class="thumb">
+            <img src="<%= h.imageUrl(p.image) %>" alt="<%= p.name %>" loading="lazy" />
+            <span class="card-ribbons">
+              <% if (outOfStock) { %><span class="badge badge-out">Out of stock</span><% } else if (lowStock) { %><span class="badge badge-low">Low stock</span><% } %>
+            </span>
+            <% if (user && !outOfStock) { %>
+              <button type="button" class="quick-add" data-product="<%= p._id %>" aria-label="Add <%= p.name %> to cart">+ Add</button>
+            <% } %>
+          </span>
+          <div class="card-body">
+            <% if (p.category) { %><span class="card-cat"><%= p.category.name %></span><% } %>
+            <h3><%= p.name %></h3>
+            <p class="muted"><%= p.profile ? p.profile.farmName : (p.farmer ? p.farmer.name : 'Local Farm') %></p>
+            <div class="card-meta">
+              <span class="price"><%= h.currency(p.price) %><small> / <%= p.unit %></small></span>
+              <% if (!outOfStock) { %><span class="card-stock <%= lowStock ? 'is-low' : '' %>"><%= p.quantityAvailable %> in stock</span><% } %>
+            </div>
+            <a class="stretched-link" href="/products/<%= p._id %>" aria-label="<%= p.name %>"></a>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <div class="empty reveal">
+      <span class="empty-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+      </span>
+      <p>No products listed yet. Check back soon!</p>
+    </div>
+  <% } %>
+</section>
